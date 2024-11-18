@@ -21,17 +21,21 @@ interface BoardState {
   label?: string
 }
 
-export default function Home() {
+export default function Component() {
   const [currentTool, setCurrentTool] = useState<'black' | 'white' | Marker>('black')
   const [board, setBoard] = useState<BoardState[][]>(
     Array(19).fill(null).map(() => Array(19).fill({ stone: null, marker: null }))
   )
   const [nextLabel, setNextLabel] = useState<string>('A')
+  const [currentPlayer, setCurrentPlayer] = useState<Stone>('black')
 
   const handleCellClick = (row: number, col: number) => {
     const newBoard = [...board]
     if (currentTool === 'black' || currentTool === 'white') {
-      newBoard[row][col] = { ...newBoard[row][col], stone: currentTool }
+      if (!newBoard[row][col].stone) {
+        newBoard[row][col] = { ...newBoard[row][col], stone: currentPlayer }
+        setCurrentPlayer(currentPlayer === 'black' ? 'white' : 'black')
+      }
     } else if (currentTool === 'letter' || currentTool === 'number') {
       newBoard[row][col] = { ...newBoard[row][col], marker: currentTool, label: nextLabel }
       setNextLabel(prev => {
@@ -48,7 +52,7 @@ export default function Home() {
   }
 
   return (
-    <main className="h-screen flex">
+    <div className="h-screen flex">
       {/* Sidebar */}
       <div className="w-64 bg-secondary p-4 flex flex-col h-full">
         {/* User Profile */}
@@ -153,16 +157,24 @@ export default function Home() {
                   </g>
                 ))
               )}
+              {/* Clickable areas */}
+              {board.map((row, rowIndex) =>
+                row.map((_, colIndex) => (
+                  <rect
+                    key={`click-${rowIndex}-${colIndex}`}
+                    x={26.3 * colIndex}
+                    y={26.3 * rowIndex}
+                    width="26.3"
+                    height="26.3"
+                    fill="transparent"
+                    onClick={() => handleCellClick(rowIndex, colIndex)}
+                  />
+                ))
+              )}
             </svg>
 
-            {/* Ventilation Tools */}
+            {/* Annotation Tools */}
             <div className="flex justify-center space-x-2">
-              <Button variant="outline" size="icon" onClick={() => setCurrentTool('black')}>
-                <Circle className="h-4 w-4" fill="black" />
-              </Button>
-              <Button variant="outline" size="icon" onClick={() => setCurrentTool('white')}>
-                <Circle className="h-4 w-4" />
-              </Button>
               <Button variant="outline" size="icon" onClick={() => setCurrentTool('cross')}>
                 <X className="h-4 w-4" />
               </Button>
@@ -193,6 +205,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   )
 }
