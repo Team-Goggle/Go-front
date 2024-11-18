@@ -30,26 +30,43 @@ export default function Component() {
   const [currentPlayer, setCurrentPlayer] = useState<Stone>('black')
 
   const handleCellClick = (row: number, col: number) => {
-    const newBoard = [...board]
+    const newBoard = [...board];
+  
+    // 좌표값 숫자를 알파벳 소문자로 변경
+    const rowLetter = String.fromCharCode(row + 97);
+    const colLetter = String.fromCharCode(col + 97);
+  
+    // 클릭된 좌표값 출력
+    console.log(`${currentPlayer} : (${row}, ${col}) == (${rowLetter}, ${colLetter})`);
+  
+    // 바둑알을 놓는 경우
     if (currentTool === 'black' || currentTool === 'white') {
-      if (!newBoard[row][col].stone) {
-        newBoard[row][col] = { ...newBoard[row][col], stone: currentPlayer }
-        setCurrentPlayer(currentPlayer === 'black' ? 'white' : 'black')
+      if (!newBoard[row][col].stone) { // 이미 바둑알이 놓여있는 자리가 아니라면
+        newBoard[row][col] = { ...newBoard[row][col], stone: currentPlayer };
+  
+        // 현재 플레이어를 교체
+        setCurrentPlayer(currentPlayer === 'black' ? 'white' : 'black');
       }
     } else if (currentTool === 'letter' || currentTool === 'number') {
-      newBoard[row][col] = { ...newBoard[row][col], marker: currentTool, label: nextLabel }
+      // 'letter'나 'number' 마커를 놓는 경우
+      newBoard[row][col] = { ...newBoard[row][col], marker: currentTool, label: nextLabel };
       setNextLabel(prev => {
         if (currentTool === 'letter') {
-          return String.fromCharCode(prev.charCodeAt(0) + 1)
+          return String.fromCharCode(prev.charCodeAt(0) + 1);
         } else {
-          return (parseInt(prev) + 1).toString()
+          return (parseInt(prev) + 1).toString();
         }
-      })
+      });
     } else {
-      newBoard[row][col] = { ...newBoard[row][col], marker: currentTool }
+      // 다른 마커를 놓는 경우 (예: cross, circle, square 등)
+      newBoard[row][col] = { ...newBoard[row][col], marker: currentTool };
     }
-    setBoard(newBoard)
+  
+    // 보드 상태 업데이트
+    setBoard(newBoard);
   }
+  
+  
 
   return (
     <div className="h-screen flex">
